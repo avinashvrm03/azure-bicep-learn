@@ -25,5 +25,4 @@ jobs:
           inlineScript: |
             az deployment group create \
               --resource-group ${{ secrets.AZURE_RG }} \
-              --template-file ./main.bicep \
-              --parameters storagePrefix=avi
+              --template-file ./main.bicep
