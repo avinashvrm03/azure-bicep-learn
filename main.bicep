@@ -1,11 +1,33 @@
-param storageName string = 'stg${uniqueString(resourceGroup().id)}'
+@description('Target Azure Region')
 param location string = resourceGroup().location
+@description('Environment tag (dev, test, prod)')
+param environment string = 'dev'
+var vnetName = 'vnet-hub-${environment}'
 
-resource storageaccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
+//Moduler invocation fo the vnet code 
+module networkModule './module/vnet.bicep' = {
+name: 'deploy-vnet-module'
+params: {
+  location: location
+  vnetName: vnetName
+}
+}
+
+// Storage Account with dynamic naming
+var storageName = 'stg\({environment}\){uniqueString(resourceGroup().id)}'
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageName
   location: location
   kind: 'StorageV2'
   sku: {
-    name: 'Standard_LRS' // Updated from Premium_LRS
+    name: 'Standard_LRS'
+
   }
+
 }
+
+// Outputs exported post-deployment
+output vnetID string = networkModule.outputs.vnetID
+output appSubnetid string = networkModule.outputs.appSubnetID
+output storageAccountName string = storageAccount.name

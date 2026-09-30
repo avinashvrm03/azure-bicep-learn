@@ -1,28 +1,50 @@
-name: Deploy Bicep Infrastructure
+name: Bicep CI-CD Pipeline
 
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
-  deploy:
+  validate-and-deploy:
     runs-on: ubuntu-latest
     steps:
+      # 1. Checkout repository
       - name: Checkout Code
         uses: actions/checkout@v4
-
+      # 2. Authenticate to Azure
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Directly execute Azure CLI deployment (More reliable & detailed error logs)
-      - name: Deploy Bicep Template
+      #3.Create Target Resource Group 
+      - name: Create Resource Group
         uses: azure/CLI@v2
         with:
           azcliversion: latest
           inlineScript: |
+            az group create --name rg-bicep-automation-dev --location eastus
+
+      # 4. Dry Run / What-If Analysis (Runs on PR & Push)
+      - name: Bicep What-if Analysis 
+        uses: azure/CLI@v2
+        with:
+          azcliversion: latest
+          inlineScript: |         
+            az deployment group what-if \
+              --resource-group rg-bicep-automation-dev \
+              --template-file ./main.bicep
+
+      # 5. Execute Deployment (Only triggers on pushes/merges to main branch)
+      - name: Deploy Bicep Infrastructure 
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: azure/CLI@v2
+        with: 
+          azcliversion: latest
+          inlineScript: |
             az deployment group create \
-              --resource-group ${{ secrets.AZURE_RG }} \
+              --resource-group rg-bicep-automation-dev \
               --template-file ./main.bicep
