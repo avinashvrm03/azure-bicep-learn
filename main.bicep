@@ -14,7 +14,7 @@ module networkModule './module/vnet.bicep' = {
   }
 
 // Storage Account with dynamic naming
-var storageName = 'stg\({environment}\){uniqueString(resourceGroup().id)}'
+var storageName = 'stg${environment}${uniqueString(resourceGroup().id)}'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageName
@@ -28,6 +28,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 }
 
 // Outputs exported post-deployment
-output vnetID string = networkModule.outputs.vnetId
+output vnetID string = networkModule.outputs.vnetID
 output appSubnetId string = networkModule.outputs.appSubnetId
 output storageAccountName string = storageAccount.name

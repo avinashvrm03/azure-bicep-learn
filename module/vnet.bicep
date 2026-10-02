@@ -33,6 +33,6 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
 }
 
 // Outputs to pass downstream to other modules or resources
-output vnetID string = vnet.Id
+output vnetID string = vnet.id
 output vnetName string = vnet.name
-output appSubnetID string = vnet.properties.subnets[0].id
+output appSubnetId string = vnet.properties.subnets[0].id
