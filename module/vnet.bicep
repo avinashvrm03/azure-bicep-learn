@@ -5,7 +5,7 @@ param vnetName string
 @description('Address prefixes for the Virtual Network')
 param vnetAddressPrefixes array = ['10.0.0.0/16']
 @description('Subnet configuration list')
-param subnet array = [
+param subnets array = [
   {
     name: 'snet-app'
     subnetPrefix: '10.0.1.0/24'
