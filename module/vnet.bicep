@@ -23,16 +23,16 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
     addressSpace: {
       addressPrefixes:vnetAddressPrefixes
     }
-    subnets: [for subnet in subnets: {
-      name: subnet.name 
+    subnets: [for sub in subnets: {
+      name: sub.name 
       properties: {
-        addressPrefix:subnet.subnetPrefix
+        addressPrefix:sub.subnetPrefix
       }
     }]
   }
 }
 
 // Outputs to pass downstream to other modules or resources
-output vnetID string = vnet.id
+output vnetID string = vnet.Id
 output vnetName string = vnet.name
 output appSubnetID string = vnet.properties.subnets[0].id
